@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: parizle-prices
+  main:
+    web-application-type: none
+  datasource:
+    url: jdbc:postgresql://localhost:5435/parizle
+    username: parizle_app
+    password: ${PARIZLE_DB_PASSWORD}
+
+bist:
+  bulletin:
+    base-url: https://www.borsaistanbul.com
+    # BIST only publishes the consolidated daily file; the site's "2. Seans" link returns 404.
+    session: 1
+    timezone: Europe/Istanbul
+    cron: "0 15 19 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    connect-timeout: 15s
+    read-timeout: 60s
+  viop:
+    timezone: Europe/Istanbul
+    # The derivatives bulletin is published after the VIOP session closes.
+    cron: "0 30 19 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    read-timeout: 60s
+
+tcmb:
+  rates:
+    base-url: https://www.tcmb.gov.tr
+    timezone: Europe/Istanbul
+    # TCMB publishes business-day rates around 15:30; weekends and holidays return 404.
+    cron: "0 30 16 * * *"
+    scheduling-enabled: true
+    max-attempts: 3
+    retry-delay: 10m
+    read-timeout: 60s
+
+frankfurter:
+  rates:
+    # ECB reference rates republished by the Frankfurter API; no authentication or quota.
+    base-url: https://api.frankfurter.dev
+    timezone: Europe/Berlin
+    # The ECB publishes reference rates around 16:00 CET on business days.
+    cron: "0 30 17 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    read-timeout: 30s
+
+london:
+  prices:
+    # Yahoo Finance chart API; London tickers use the ".L" suffix (e.g. VOD.L).
+    base-url: https://query1.finance.yahoo.com
+    # Yahoo answers 429 to Java's and curl's default User-Agent; a browser string is required.
+    user-agent: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)"
+    timezone: Europe/London
+    # The LSE closes at 16:30 London time; Yahoo publishes the final daily bar after that.
+    cron: "0 30 18 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    read-timeout: 30s
+
+us:
+  prices:
+    # NYSE and NASDAQ tickers use Yahoo symbols without a suffix (e.g. AAPL, IBM).
+    base-url: https://query1.finance.yahoo.com
+    user-agent: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)"
+    timezone: America/New_York
+    # The regular session closes at 16:00 New York time.
+    cron: "0 30 17 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    read-timeout: 30s
+
+hongkong:
+  prices:
+    # Yahoo lists Hong Kong stocks as four-digit codes with a ".HK" suffix (e.g. 0700.HK).
+    base-url: https://query1.finance.yahoo.com
+    user-agent: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)"
+    timezone: Asia/Hong_Kong
+    # HKEX closes at 16:00 Hong Kong time.
+    cron: "0 30 17 * * MON-FRI"
+    scheduling-enabled: true
+    max-attempts: 6
+    retry-delay: 10m
+    read-timeout: 30s
+
+logging:
+  level:
+    com.parizle.prices: INFO

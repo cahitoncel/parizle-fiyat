@@ -1,0 +1,33 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "GBp",
+          "symbol": "VOD.L",
+          "exchangeName": "LSE",
+          "instrumentType": "EQUITY",
+          "regularMarketPrice": 102.25
+        },
+        "timestamp": [1793865600, 1793952000],
+        "indicators": {
+          "quote": [
+            {
+              "open": [99.9, 100.2],
+              "high": [101.1, 103.4],
+              "low": [98.6, 99.8],
+              "close": [100.5, 102.25],
+              "volume": [11111111, 22222222]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [100.5, 102.25]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}

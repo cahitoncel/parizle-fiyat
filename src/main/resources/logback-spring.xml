@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_DIR" value="${LOG_DIR:-logs}"/>
+    <!-- Timestamps are UTC so log lines look the same wherever the server runs. -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX,UTC} %-5level [%thread] %logger{40} - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Jobs run once a day, so the run date and job name identify a single run. -->
+    <appender name="JOB_RUN" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="com.parizle.prices.logging.JobRunMdcFilter"/>
+        <discriminator>
+            <key>jobRun</key>
+            <defaultValue>unassigned</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="JOB_RUN_FILE" class="ch.qos.logback.core.FileAppender">
+                <file>${LOG_DIR}/jobs/${jobRun}.log</file>
+                <append>true</append>
+                <encoder>
+                    <pattern>${LOG_PATTERN}</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <!-- One place for every warning and error, inside or outside a job. -->
+    <appender name="PROBLEMS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/problems.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/problems.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JOB_RUN"/>
+        <appender-ref ref="PROBLEMS"/>
+    </root>
+
+</configuration>
